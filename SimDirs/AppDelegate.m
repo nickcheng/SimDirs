@@ -18,13 +18,11 @@
 
 @implementation AppDelegate
 
-- (void) applicationDidFinishLaunching: (NSNotification *) inNotification
-{
-}
+- (void)applicationDidFinishLaunching:(NSNotification *)inNotification
+{}
 
--(BOOL) applicationShouldTerminateAfterLastWindowClosed: (NSApplication *) inSender
-{
-    return YES;
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)inSender {
+  return YES;
 }
 
 @end

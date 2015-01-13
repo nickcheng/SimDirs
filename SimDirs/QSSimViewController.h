@@ -10,21 +10,21 @@
 
 @protocol QSOutlineProvider <NSObject>
 
-- (NSInteger)			outlineChildCount;
-- (id)					outlineChildAtIndex: (NSInteger) inIndex;
-- (BOOL)				outlineItemIsExpanable;
-- (NSString *)			outlineItemTitle;
-- (NSImage *)			outlineItemImage;
+- (NSInteger)outlineChildCount;
+- (id)outlineChildAtIndex:(NSInteger)inIndex;
+- (BOOL)outlineItemIsExpanable;
+- (NSString *)outlineItemTitle;
+- (NSImage *) outlineItemImage;
 
-- (BOOL)				outlineItemPerformAction;
-- (BOOL)				outlineItemPerformActionForChild: (id) inChild;
+- (BOOL)outlineItemPerformAction;
+- (BOOL)outlineItemPerformActionForChild:(id)inChild;
 
 @end
 
 @interface QSSimViewController : NSObject
 
-- (IBAction)			openSelectedDeviceLocation: (id) inSender;
-- (IBAction)			openSelectedAppBundleLoc: (id) inSender;
-- (IBAction)			openSelectedAppSandboxLoc: (id) inSender;
+- (IBAction)openSelectedDeviceLocation:(id)inSender;
+- (IBAction)openSelectedAppBundleLoc:(id)inSender;
+- (IBAction)openSelectedAppSandboxLoc:(id)inSender;
 
 @end
