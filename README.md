@@ -1,3 +1,8 @@
+Modifications
+=============
+
+Three columns layout. Please see the screen shot below.
+
 SimDirs
 =======
 
