@@ -9,4 +9,4 @@ Use the refresh button to update locations after installing or deleting an app f
 
 That's it.
 
-![Screenshot](https://raw.githubusercontent.com/somegeekintn/SimDirs/master/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/nickcheng/SimDirs/master/screenshot.png)
