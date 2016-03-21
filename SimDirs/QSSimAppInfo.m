@@ -49,7 +49,11 @@
   }
 }
 
-- (void)refinePaths {
+- (void) updateFromCacheInfo: (NSDictionary *) inCachedInfo
+{
+	self.bundlePath = inCachedInfo[@"Container"];
+}
+
   NSFileManager *fileManager = [NSFileManager defaultManager];
   NSURL         *infoURL;
 

@@ -73,6 +73,7 @@
 
             [self gatherAppInfoFromLastLaunchMap];
             [self gatherAppInfoFromAppState];
+						[self gatherAppInfoFromCaches];
             [self gatherAppInfoFromInstallLogs];
             [self cleanupAndRefineAppList];
 
@@ -126,20 +127,74 @@
 // applicationState.plist sometimes has info that LastLaunchServicesMap.plist doesn't
 - (void)gatherAppInfoFromAppState {
   NSFileManager *fileManager     = [NSFileManager defaultManager];
-  NSURL         *appStateInfoURL = [self.baseURL URLByAppendingPathComponent:@"data/Library/BackBoard/applicationState.plist"];
+	NSArray			*appStatePathFragment = @[ @"data/Library/FrontBoard/applicationState.plist", @"data/Library/BackBoard/applicationState.plist" ];
+	
+	for (NSString *pathFragment in appStatePathFragment) {
+		NSURL			*appStateInfoURL = [self.baseURL URLByAppendingPathComponent: pathFragment];
+		
+		if (appStateInfoURL != nil && [fileManager fileExistsAtPath: [appStateInfoURL path]]) {
+			NSData			*plistData = [NSData dataWithContentsOfURL: appStateInfoURL];
+			NSDictionary	*stateInfo;
+			
+			stateInfo = [NSPropertyListSerialization propertyListWithData: plistData options: NSPropertyListImmutable format: nil error: nil];
+			
+			for (NSString *bundleID in stateInfo) {
+				if ([bundleID rangeOfString: @"com.apple"].location == NSNotFound) {
+					QSSimAppInfo			*appInfo = [self appInfoWithBundleID: bundleID];
+					
+					if (appInfo != nil) {
+						[appInfo updateFromAppStateInfo: stateInfo[bundleID]];
+					}
+				}
+			}
+		}
+	}
+}
 
-  if (appStateInfoURL != nil && [fileManager fileExistsAtPath:[appStateInfoURL path]]) {
-    NSData       *plistData = [NSData dataWithContentsOfURL:appStateInfoURL];
-    NSDictionary *stateInfo;
+// Xcode 6.2 seems to have changed things up for 7.1 apps
+- (void) gatherAppInfoFromCaches
+{
+	NSFileManager	*fileManager = [NSFileManager defaultManager];
+	NSURL			*cacheDirURL = [self.baseURL URLByAppendingPathComponent: @"data/Library/Caches/"];
 
-    stateInfo = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListImmutable format:nil error:nil];
+	if (cacheDirURL != nil) {
+		NSArray		*cacheFileURLs = [fileManager contentsOfDirectoryAtURL: cacheDirURL includingPropertiesForKeys: nil
+											options: NSDirectoryEnumerationSkipsSubdirectoryDescendants | NSDirectoryEnumerationSkipsPackageDescendants error: nil];
+		
+		if (cacheFileURLs != nil) {
+			NSInteger	installInfoIndex;
+			
+			installInfoIndex = [cacheFileURLs indexOfObjectPassingTest: ^(id inObject, NSUInteger inIndex, BOOL *outStop) {
+				NSURL	*testURL = inObject;
+				BOOL	match = NO;
+				
+				if ([[testURL path] rangeOfString: @"com.apple.mobile.installation"].location != NSNotFound) {
+					match = YES;
+				}
+				
+				*outStop = match;
+				return match;
+			}];
+			
+			if (installInfoIndex != NSNotFound) {
+				NSURL			*installInfoURL = [cacheFileURLs objectAtIndex: installInfoIndex];
+				NSData			*plistData = [NSData dataWithContentsOfURL: installInfoURL];
+			
+				if (plistData != nil) {
+					NSDictionary	*installInfo;
+					NSDictionary	*userInfo;
+					
+					installInfo = [NSPropertyListSerialization propertyListWithData: plistData options: NSPropertyListImmutable format: nil error: nil];
+					userInfo = installInfo[@"User"];
+					if (userInfo != nil) {
+						for (NSString *bundleID in [userInfo allKeys]) {
+							QSSimAppInfo			*appInfo = [self appInfoWithBundleID: bundleID];
 
-    for (NSString *bundleID in stateInfo) {
-      if ([bundleID rangeOfString:@"com.apple"].location == NSNotFound) {
-        QSSimAppInfo *appInfo = [self appInfoWithBundleID:bundleID];
-
-        if (appInfo != nil) {
-          [appInfo updateFromAppStateInfo:stateInfo[bundleID]];
+							if (appInfo != nil) {
+								[appInfo updateFromCacheInfo: userInfo[bundleID]];
+							}
+						}
+					}
         }
       }
     }
