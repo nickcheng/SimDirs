@@ -54,6 +54,8 @@
 	self.bundlePath = inCachedInfo[@"Container"];
 }
 
+- (void) refinePaths {
+
   NSFileManager *fileManager = [NSFileManager defaultManager];
   NSURL         *infoURL;
 
