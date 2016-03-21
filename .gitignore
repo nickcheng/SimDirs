@@ -1,0 +1,9 @@
+version.plist
+UserInterfaceState.xcuserstate
+xcuserdata
+
+# Root level build directory
+/build
+
+.DS_Store
+
